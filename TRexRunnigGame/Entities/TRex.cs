@@ -9,6 +9,9 @@ namespace TRexRunnigGame.Entities
 {
     public class TRex : IGameEntity
     {
+        private float GRAVITY = 30f;
+        private const float JumpSpeed = -10f;
+
         public const int Trexpos = 848;
         public const int TrexYpos = 0;
         public const int TrexWidth = 44;
@@ -39,6 +42,10 @@ namespace TRexRunnigGame.Entities
 
         private SoundEffect _JumpSound;
 
+        private float _Verveloc;
+
+        private float _startposy;
+
         public TRex(Texture2D spritesheet, Vector2 position, SoundEffect jumpSound)
         {
             this.Position = position;
@@ -54,6 +61,8 @@ namespace TRexRunnigGame.Entities
 
             CreateBlinkAnimation();
             _BlinkAnimation.Play();
+
+            _startposy = Position.Y;
         }
 
         public void Drew(SpriteBatch spritebatch, GameTime gametime)
@@ -65,7 +74,12 @@ namespace TRexRunnigGame.Entities
 
             }
 
+            else if (State == TrexState.jumping || State == TrexState.falling)
+            {
 
+                _IdleSprit.Drew(spritebatch, Position);
+
+            }
             
 
         }
@@ -82,6 +96,22 @@ namespace TRexRunnigGame.Entities
                     _BlinkAnimation.Play();
                 }
                 _BlinkAnimation.Update(gametime);
+            }
+
+            else if (State == TrexState.jumping || State == TrexState.falling)
+            {
+                Position = new Vector2(Position.X, Position.Y + _Verveloc * (float)gametime.ElapsedGameTime.TotalSeconds);
+                _Verveloc += GRAVITY * (float)gametime.ElapsedGameTime.TotalSeconds;
+
+                if(Position.Y >= _startposy)
+                {
+
+                    Position = new Vector2(Position.X, Position.Y);
+                    _Verveloc = 0;
+                    State = TrexState.idle;
+                }
+
+
             }
         }
 
@@ -104,6 +134,8 @@ namespace TRexRunnigGame.Entities
                 return false;
             }
             _JumpSound.Play();
+            State = TrexState.jumping;
+            _Verveloc = JumpSpeed;
             return true;
         }
 
