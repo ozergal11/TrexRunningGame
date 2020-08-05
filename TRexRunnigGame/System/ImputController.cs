@@ -26,18 +26,17 @@ namespace TRexRunnigGame.System
 
             if (!_previouskeyBoradState.IsKeyDown(Keys.Up) && KeyboardState.IsKeyDown(Keys.Up))
             {
-                if(_Trex.State != TrexState.jumping)
+                if (_Trex.State != TrexState.jumping)
                 {
                     _Trex.StartJumping();
 
                 }
 
-                else
-                {
-                    _Trex.ContinueJumping();
-                } 
+            }
 
-
+            else if (_Trex.State == TrexState.jumping && !KeyboardState.IsKeyDown(Keys.Up))
+            {
+                _Trex.CancleJump();
             }
             _previouskeyBoradState = KeyboardState;
 

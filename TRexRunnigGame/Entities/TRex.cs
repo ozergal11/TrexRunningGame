@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using TRexRunnigGame.Graphics;
 using Microsoft.Xna.Framework;
 using System;
@@ -9,8 +8,12 @@ namespace TRexRunnigGame.Entities
 {
     public class TRex : IGameEntity
     {
-        private float GRAVITY = 30f;
-        private const float JumpSpeed = -10f;
+        private const float MinJumpHeight = 40f;
+
+        private float GRAVITY = 1600f;
+        private const float JumpSpeed = -450f;
+
+        private const float cancleJumpVelo = -200f;
 
         public const int Trexpos = 848;
         public const int TrexYpos = 0;
@@ -103,6 +106,9 @@ namespace TRexRunnigGame.Entities
                 Position = new Vector2(Position.X, Position.Y + _Verveloc * (float)gametime.ElapsedGameTime.TotalSeconds);
                 _Verveloc += GRAVITY * (float)gametime.ElapsedGameTime.TotalSeconds;
 
+                if (_Verveloc >= 0)
+                    State = TrexState.falling;
+
                 if(Position.Y >= _startposy)
                 {
 
@@ -140,9 +146,14 @@ namespace TRexRunnigGame.Entities
         }
 
 
-        public bool ContinueJumping()
+        public bool CancleJump()
         {
+            if (State != TrexState.jumping || (_startposy -Position.Y) < MinJumpHeight)
+                return false;
 
+            State = TrexState.falling;
+            _Verveloc = _Verveloc < cancleJumpVelo ? cancleJumpVelo : 0;
+                
             return true;
 
         }
