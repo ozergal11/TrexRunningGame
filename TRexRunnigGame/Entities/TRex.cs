@@ -8,6 +8,9 @@ namespace TRexRunnigGame.Entities
 {
     public class TRex : IGameEntity
     {
+
+        private const float Run_Length = 0.1f;
+        
         private const float MinJumpHeight = 40f;
 
         private float GRAVITY = 1600f;
@@ -20,15 +23,25 @@ namespace TRexRunnigGame.Entities
         public const int TrexWidth = 44;
         public const int TrexHeiht = 52;
 
+        private const int TREX_DUCKING_WITDH = 59;
+        private const int Trex_Ducking_X = Trexpos + TrexWidth * 6; 
+
+
         public const int _IdleBAckGround_posY = 0;
         public const int _IdleBAckGround_posX = 40;
         private const float Blink_Animation = 1f/4;
 
+        private const float DropVelo = 600f;
+
         private Sprite _IdleSprit;
         private Sprite _IdleBlinkSprite;
         private SpriteAnimation _runAnimation;
+        private SpriteAnimation _DuckingAnimation;
+
+         
 
         private Random _random;
+
 
         public Vector2 Position { get; set; }
 
@@ -47,8 +60,9 @@ namespace TRexRunnigGame.Entities
         private SoundEffect _JumpSound;
 
         private float _Verveloc;
-
         private float _startposy;
+        private float _DropVelo;
+
 
         public TRex(Texture2D spritesheet, Vector2 position, SoundEffect jumpSound)
         {
@@ -71,11 +85,18 @@ namespace TRexRunnigGame.Entities
             _runAnimation = new SpriteAnimation();
 
             _runAnimation.AddFrame(new Sprite(spritesheet, Trexpos + TrexWidth * 2, TrexYpos, TrexWidth, TrexHeiht), 0);
-            _runAnimation.AddFrame(new Sprite(spritesheet, Trexpos + TrexWidth * 3, TrexYpos, TrexWidth, TrexHeiht), 1/8f);
-            _runAnimation.AddFrame(_runAnimation[0].Sprite, 1/4f);
+            _runAnimation.AddFrame(new Sprite(spritesheet, Trexpos + TrexWidth * 3, TrexYpos, TrexWidth, TrexHeiht), Run_Length);
+            _runAnimation.AddFrame(_runAnimation[0].Sprite, Run_Length*2);
 
             _runAnimation.Play();
             _runAnimation.ShouldLoop = true;
+
+            _DuckingAnimation = new SpriteAnimation();
+            _DuckingAnimation.AddFrame(new Sprite(spritesheet, Trex_Ducking_X, TrexYpos, TREX_DUCKING_WITDH, TrexHeiht), 0);
+            _DuckingAnimation.AddFrame(new Sprite(spritesheet, Trex_Ducking_X + TREX_DUCKING_WITDH, TrexYpos, TREX_DUCKING_WITDH, TrexHeiht), Run_Length);
+            _DuckingAnimation.AddFrame(_DuckingAnimation[0].Sprite, Run_Length * 2);
+
+            _DuckingAnimation.Play(); 
         }
 
         public void Drew(SpriteBatch spritebatch, GameTime gametime)
@@ -99,7 +120,10 @@ namespace TRexRunnigGame.Entities
                 _runAnimation.Drew(spritebatch, Position);
             }
             
-
+            else if (State == TrexState.ducking)
+            {
+                _DuckingAnimation.Drew(spritebatch, Position);
+            }
         }
 
         public void Update(GameTime gametime)
@@ -118,7 +142,9 @@ namespace TRexRunnigGame.Entities
 
             else if (State == TrexState.jumping || State == TrexState.falling)
             {
-                Position = new Vector2(Position.X, Position.Y + _Verveloc * (float)gametime.ElapsedGameTime.TotalSeconds);
+
+
+                Position = new Vector2(Position.X, Position.Y + _Verveloc * (float)gametime.ElapsedGameTime.TotalSeconds + _DropVelo * (float)gametime.ElapsedGameTime.TotalSeconds);
                 _Verveloc += GRAVITY * (float)gametime.ElapsedGameTime.TotalSeconds;
 
                 if (_Verveloc >= 0)
@@ -139,6 +165,14 @@ namespace TRexRunnigGame.Entities
             {
                 _runAnimation.Update(gametime);
             }
+
+            else if(State == TrexState.ducking)
+            {
+                _DuckingAnimation.Update(gametime);
+            }
+
+            _DropVelo = 0;
+
         }
 
         private void CreateBlinkAnimation()
@@ -171,15 +205,42 @@ namespace TRexRunnigGame.Entities
             if (State != TrexState.jumping || (_startposy -Position.Y) < MinJumpHeight)
                 return false;
 
-            State = TrexState.falling;
+            
             _Verveloc = _Verveloc < cancleJumpVelo ? cancleJumpVelo : 0;
                 
             return true;
 
         }
 
+        public bool Duck()
+        {
+            if (State == TrexState.jumping || State == TrexState.falling)
+                return false;
 
 
+            State = TrexState.ducking;
+            return true;
+        }
 
+        public bool CancleDucking()
+        {
+            if (State != TrexState.ducking)
+                return false;
+
+            State = TrexState.runnig;
+            return true;
+        }
+
+        public bool Drop()
+        {
+            if (State != TrexState.falling && State !=TrexState.jumping)
+                return false;
+
+
+            State = TrexState.falling;
+
+            _DropVelo = DropVelo;
+            return true;
+        }
     }
 }

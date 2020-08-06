@@ -24,7 +24,10 @@ namespace TRexRunnigGame.System
         {
             KeyboardState KeyboardState = Keyboard.GetState();
 
-            if (!_previouskeyBoradState.IsKeyDown(Keys.Up) && KeyboardState.IsKeyDown(Keys.Up))
+            bool  IsJumpKeyPressed = KeyboardState.IsKeyDown(Keys.Up) || KeyboardState.IsKeyDown(Keys.Space);
+            bool wasJumpKeyPressed = _previouskeyBoradState.IsKeyDown(Keys.Up) || _previouskeyBoradState.IsKeyDown(Keys.Space);
+
+            if (!wasJumpKeyPressed && IsJumpKeyPressed)
             {
                 if (_Trex.State != TrexState.jumping)
                 {
@@ -34,13 +37,25 @@ namespace TRexRunnigGame.System
 
             }
 
-            else if (_Trex.State == TrexState.jumping && !KeyboardState.IsKeyDown(Keys.Up))
+            else if (_Trex.State == TrexState.jumping && !IsJumpKeyPressed )
             {
                 _Trex.CancleJump();
             }
+
+            else if (KeyboardState.IsKeyDown(Keys.Down))
+            {
+                if (_Trex.State == TrexState.jumping || _Trex.State == TrexState.falling)
+                    _Trex.Drop();
+                else
+                    _Trex.Duck();
+
+            }
+
+            else if (_Trex.State == TrexState.ducking && !KeyboardState.IsKeyDown(Keys.Down))
+            {
+                _Trex.CancleDucking();
+            }
             _previouskeyBoradState = KeyboardState;
-
-
         }
     }
 }
