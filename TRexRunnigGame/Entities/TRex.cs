@@ -26,6 +26,7 @@ namespace TRexRunnigGame.Entities
 
         private Sprite _IdleSprit;
         private Sprite _IdleBlinkSprite;
+        private SpriteAnimation _runAnimation;
 
         private Random _random;
 
@@ -59,13 +60,22 @@ namespace TRexRunnigGame.Entities
 
             _IdleSprit = new Sprite(spritesheet, Trexpos, TrexYpos, TrexWidth, TrexHeiht);
             _IdleBlinkSprite = new Sprite(spritesheet, Trexpos + TrexWidth, TrexYpos, TrexWidth, TrexHeiht);
-
             _BlinkAnimation = new SpriteAnimation();
 
             CreateBlinkAnimation();
             _BlinkAnimation.Play();
 
             _startposy = Position.Y;
+
+
+            _runAnimation = new SpriteAnimation();
+
+            _runAnimation.AddFrame(new Sprite(spritesheet, Trexpos + TrexWidth * 2, TrexYpos, TrexWidth, TrexHeiht), 0);
+            _runAnimation.AddFrame(new Sprite(spritesheet, Trexpos + TrexWidth * 3, TrexYpos, TrexWidth, TrexHeiht), 1/8f);
+            _runAnimation.AddFrame(_runAnimation[0].Sprite, 1/4f);
+
+            _runAnimation.Play();
+            _runAnimation.ShouldLoop = true;
         }
 
         public void Drew(SpriteBatch spritebatch, GameTime gametime)
@@ -82,6 +92,11 @@ namespace TRexRunnigGame.Entities
 
                 _IdleSprit.Drew(spritebatch, Position);
 
+            }
+
+            else if (State == TrexState.runnig)
+            {
+                _runAnimation.Drew(spritebatch, Position);
             }
             
 
@@ -114,10 +129,15 @@ namespace TRexRunnigGame.Entities
 
                     Position = new Vector2(Position.X, Position.Y);
                     _Verveloc = 0;
-                    State = TrexState.idle;
+                    State = TrexState.runnig;
                 }
 
 
+            }
+
+            else if(State == TrexState.runnig)
+            {
+                _runAnimation.Update(gametime);
             }
         }
 
