@@ -49,7 +49,7 @@ namespace TRexRunnigGame.Entities
 
         public bool IsAlive { get; private set; }
 
-        public float Speed { get; private set; }
+        public float Speed { get; private set; }  
 
         public int DrewOrder {  get; set; }
 
@@ -90,14 +90,14 @@ namespace TRexRunnigGame.Entities
 
             _runAnimation.Play();
             _runAnimation.ShouldLoop = true;
-
+             
             _DuckingAnimation = new SpriteAnimation();
             _DuckingAnimation.AddFrame(new Sprite(spritesheet, Trex_Ducking_X, TrexYpos, TREX_DUCKING_WITDH, TrexHeiht), 0);
             _DuckingAnimation.AddFrame(new Sprite(spritesheet, Trex_Ducking_X + TREX_DUCKING_WITDH, TrexYpos, TREX_DUCKING_WITDH, TrexHeiht), Run_Length);
             _DuckingAnimation.AddFrame(_DuckingAnimation[0].Sprite, Run_Length * 2);
 
             _DuckingAnimation.Play(); 
-        }
+        }  
 
         public void Drew(SpriteBatch spritebatch, GameTime gametime)
         {

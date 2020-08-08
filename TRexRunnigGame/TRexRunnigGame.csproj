@@ -101,9 +101,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\EntityManager.cs" />
+    <Compile Include="Entities\GroundManager.cs" />
+    <Compile Include="Entities\GroundTile.cs" />
     <Compile Include="Entities\IGameEntity.cs" />
     <Compile Include="Entities\TRex.cs" />
     <Compile Include="Entities\TrexState.cs" />
+    <Compile Include="GameState.cs" />
     <Compile Include="Graphics\Sprite.cs" />
     <Compile Include="Graphics\SpriteAnimation.cs" />
     <Compile Include="Graphics\SpriteAnimationFraem.cs" />
